@@ -380,7 +380,7 @@ def bake_and_export_combined_glb():
     bpy.ops.object.mode_set(mode='OBJECT')
     
     # 4. Create the target image texture
-    export_dir = r"C:\Users\negih\Downloads\grok_try_resume"
+    export_dir = r"C:\Users\negih\Downloads\grok_try_resume\public"
     if not os.path.exists(export_dir):
         os.makedirs(export_dir)
     img_path = os.path.join(export_dir, "room_baked_combined.png")
@@ -533,6 +533,11 @@ def build_room():
     book_red_mat = create_simple_material("BookRedMat", (0.85, 0.15, 0.15, 1.0), roughness=0.8)
     book_teal_mat = create_simple_material("BookTealMat", (0.15, 0.65, 0.65, 1.0), roughness=0.8)
     book_yellow_mat = create_simple_material("BookYellowMat", (0.95, 0.75, 0.1, 1.0), roughness=0.8)
+    
+    # Plant materials
+    plant_pot_mat = create_simple_material("PlantPotMat", (0.95, 0.95, 0.93, 1.0), roughness=0.3)
+    plant_leaf_mat = create_simple_material("PlantLeafMat", (0.18, 0.48, 0.22, 1.0), roughness=0.8)
+    plant_soil_mat = create_simple_material("PlantSoilMat", (0.28, 0.18, 0.12, 1.0), roughness=0.9)
 
     # 3. Create Wood Planks Floor
     create_floor_planks()
@@ -639,63 +644,27 @@ def build_room():
     create_cylinder("Wardrobe_KeyShaft", (-0.95, 1.41, 1.15), radius=0.0018, depth=0.025, rotation=(1.5708, 0, 0), material=metal_mat)
     create_cylinder("Wardrobe_KeyHead", (-0.95, 1.395, 1.15), radius=0.006, depth=0.003, rotation=(1.5708, 0, 0), material=metal_mat)
 
-    # 8. Bed (Along the left wall)
-    create_cube("BedFrame_SideR", (-0.61, -0.35, 0.175), (0.02, 1.15, 0.175), material=wood_mat, bevel_width=0.01)
-    create_cube("BedFrame_SideL", (-1.89, -0.35, 0.175), (0.02, 1.15, 0.175), material=wood_mat, bevel_width=0.01)
-    create_cube("BedFrame_Front", (-1.25, -1.49, 0.175), (0.62, 0.02, 0.175), material=wood_mat, bevel_width=0.01)
-    create_cube("BedFrame_Headboard", (-1.25, 0.79, 0.3), (0.62, 0.02, 0.3), material=wood_mat, bevel_width=0.01)
+    # 8. Bed & Bedding (Squarish double bed frame: 1.5m width x 1.8m length)
+    create_cube("BedFrame_SideR", (-0.49, -0.3, 0.175), (0.02, 0.9, 0.175), material=wood_mat, bevel_width=0.01)
+    create_cube("BedFrame_SideL", (-1.99, -0.3, 0.175), (0.02, 0.9, 0.175), material=wood_mat, bevel_width=0.01)
+    create_cube("BedFrame_Front", (-1.24, -1.21, 0.175), (0.73, 0.02, 0.175), material=wood_mat, bevel_width=0.01)
+    create_cube("BedFrame_Headboard", (-1.24, 0.61, 0.3), (0.73, 0.02, 0.3), material=wood_mat, bevel_width=0.01)
+    
     # Mattress
-    create_cube("Mattress", (-1.25, -0.35, 0.36), (0.61, 1.11, 0.09), material=bedsheet_mat, bevel_width=0.02)
+    create_cube("Mattress", (-1.24, -0.3, 0.36), (0.72, 0.88, 0.09), material=bedsheet_mat, bevel_width=0.02)
     # Pillows
-    p1 = create_cube("Pillow_1", (-1.4, 0.45, 0.45), (0.21, 0.15, 0.035), material=slate_pillow_mat, bevel_width=0.015)
+    p1 = create_cube("Pillow_1", (-1.55, 0.35, 0.45), (0.24, 0.16, 0.035), material=slate_pillow_mat, bevel_width=0.015)
     p1.rotation_euler = (0.05, -0.05, 0.08)
-    p2 = create_cube("Pillow_2", (-1.0, 0.45, 0.45), (0.21, 0.15, 0.035), material=slate_pillow_mat, bevel_width=0.015)
+    p2 = create_cube("Pillow_2", (-0.93, 0.35, 0.45), (0.24, 0.16, 0.035), material=slate_pillow_mat, bevel_width=0.015)
     p2.rotation_euler = (0.05, 0.05, -0.08)
     # Draped blankets
-    create_cube("Blanket_Purple_Top", (-1.25, -0.3, 0.42), (0.6, 0.8, 0.02), material=purple_blanket_mat, bevel_width=0.015)
-    create_cube("Blanket_Purple_Drape", (-0.63, -0.3, 0.285), (0.01, 0.8, 0.135), material=purple_blanket_mat, bevel_width=0.015)
+    create_cube("Blanket_Purple_Top", (-1.24, -0.2, 0.42), (0.72, 0.6, 0.02), material=purple_blanket_mat, bevel_width=0.015)
+    create_cube("Blanket_Purple_Drape", (-0.51, -0.2, 0.285), (0.01, 0.6, 0.135), material=purple_blanket_mat, bevel_width=0.015)
 
-    # 8b. Potted Plant (Cozy Monstera in back-left corner near window and bed)
-    plant_pot_mat = create_simple_material("PlantPotMat", (0.95, 0.95, 0.93, 1.0), roughness=0.3)
-    plant_leaf_mat = create_simple_material("PlantLeafMat", (0.18, 0.48, 0.22, 1.0), roughness=0.8)
-    plant_soil_mat = create_simple_material("PlantSoilMat", (0.28, 0.18, 0.12, 1.0), roughness=0.9)
-    
-    # White ceramic pot
-    create_cylinder("Plant_Pot", (-1.7, 1.7, 0.1), radius=0.12, depth=0.2, material=plant_pot_mat)
-    # Soil inside
-    create_cylinder("Plant_Soil", (-1.7, 1.7, 0.19), radius=0.11, depth=0.02, material=plant_soil_mat)
-    # Plant stems and leaves
-    create_cylinder("Plant_Stem", (-1.7, 1.7, 0.35), radius=0.008, depth=0.3, rotation=(0.1, 0.05, 0), material=plant_leaf_mat)
-    # 4 large stylized rotated leaves
-    for l in range(4):
-        angle = l * math.pi / 2 + 0.3
-        lx = -1.7 + 0.12 * math.cos(angle)
-        ly = 1.7 + 0.12 * math.sin(angle)
-        lz = 0.38 + l * 0.05
-        leaf_obj = create_cube(f"Plant_Leaf_{l}", (lx, ly, lz), (0.09, 0.11, 0.003), material=plant_leaf_mat, bevel_width=0.001)
-        leaf_obj.rotation_euler = (0.4, 0.2, angle + 1.57)
 
-    # 8c. Cozy Bedside Table (Next to the pillow)
-    create_cube("BedsideTable", (-0.75, 0.5, 0.15), (0.11, 0.11, 0.15), material=wood_mat, bevel_width=0.005)
-    # Tiny coffee cup on bedside table
-    create_cylinder("BedsideCup", (-0.75, 0.5, 0.32), radius=0.025, depth=0.04, material=plant_pot_mat)
-    create_cylinder("BedsideCup_Handle", (-0.73, 0.5, 0.32), radius=0.01, depth=0.008, rotation=(1.5708, 0, 0), material=plant_pot_mat)
 
-    # 8d. Cozy Floor Rug (Soft cream fabric carpet under the desk/chair area)
-    rug_mat = create_simple_material("RugMat", (0.88, 0.85, 0.81, 1.0), roughness=0.95)
-    create_cube("FloorRug", (0.7, 0.5, 0.001), (0.55, 0.85, 0.0015), material=rug_mat, bevel_width=0.0005)
-
-    # 8e. Left Wall Floating Shelf with Books (Above the Bed)
-    create_cube("LeftWallShelf", (-1.95, -0.35, 1.6), (0.04, 0.45, 0.015), material=wood_mat, bevel_width=0.003)
-    for i in range(4):
-        by = -0.45 + i * 0.06
-        b_mat = random.choice([book_red_mat, book_teal_mat, book_yellow_mat])
-        bk = create_cube(f"ShelfBook_{i}", (-1.94, by, 1.69), (0.035, 0.015, 0.08), material=b_mat, bevel_width=0.002)
-        bk.rotation_euler[0] = 0.08
-
-    # 9. Study Desk (Remodeled based on actual photos: 1.2m wide, 0.6m deep)
-    # Create a parent empty for the desk to allow rotating it as a single unit
-    bpy.ops.object.empty_add(type='PLAIN_AXES', location=(1.2, 0.7, 0.0))
+    # 9. Study Desk (Original 1.2m width, shifted to the right to X = 1.4, slimmed depth to 0.5m)
+    bpy.ops.object.empty_add(type='PLAIN_AXES', location=(1.4, 0.7, 0.0))
     desk_parent = bpy.context.active_object
     desk_parent.name = "Desk_Group"
 
@@ -704,74 +673,74 @@ def build_room():
         obj.matrix_parent_inverse = desk_parent.matrix_world.inverted()
         return obj
 
-    # Desktop (slightly overhanging the side panels)
-    addToDesk(create_cube("Desk_Top", (1.2, 0.7, 0.735), (0.62, 0.32, 0.015), material=wood_mat, bevel_width=0.008))
+    # Desktop (1.2m wide, 0.5m deep)
+    addToDesk(create_cube("Desk_Top", (1.2, 0.7, 0.735), (0.6, 0.25, 0.015), material=wood_mat, bevel_width=0.008))
     
     # Left and Right solid wood side panels
-    addToDesk(create_cube("Desk_Panel_Left", (0.61, 0.7, 0.36), (0.015, 0.3, 0.36), material=wood_mat, bevel_width=0.005))
-    addToDesk(create_cube("Desk_Panel_Right", (1.79, 0.7, 0.36), (0.015, 0.3, 0.36), material=wood_mat, bevel_width=0.005))
+    addToDesk(create_cube("Desk_Panel_Left", (0.61, 0.7, 0.36), (0.015, 0.23, 0.36), material=wood_mat, bevel_width=0.005))
+    addToDesk(create_cube("Desk_Panel_Right", (1.79, 0.7, 0.36), (0.015, 0.23, 0.36), material=wood_mat, bevel_width=0.005))
     
     # Modesty Panel (Back board)
-    addToDesk(create_cube("Desk_Modesty_Back", (0.965, 0.985, 0.51), (0.335, 0.015, 0.21), material=wood_mat, bevel_width=0.003))
+    addToDesk(create_cube("Desk_Modesty_Back", (1.03, 0.915, 0.51), (0.4, 0.015, 0.21), material=wood_mat, bevel_width=0.003))
     
     # Slidable Keyboard Tray
-    addToDesk(create_cube("Desk_Keyboard_Tray", (0.955, 0.65, 0.66), (0.325, 0.22, 0.01), material=wood_mat, bevel_width=0.003))
+    addToDesk(create_cube("Desk_Keyboard_Tray", (1.03, 0.65, 0.66), (0.35, 0.18, 0.01), material=wood_mat, bevel_width=0.003))
     
     # Horizontal Footrest Shelf at the bottom of legroom
-    addToDesk(create_cube("Desk_Footrest_Shelf", (0.955, 0.7, 0.11), (0.325, 0.25, 0.01), material=wood_mat, bevel_width=0.003))
+    addToDesk(create_cube("Desk_Footrest_Shelf", (1.03, 0.7, 0.11), (0.4, 0.18, 0.01), material=wood_mat, bevel_width=0.003))
     # Front riser board below footrest shelf
-    addToDesk(create_cube("Desk_Footrest_Riser", (0.955, 0.45, 0.05), (0.325, 0.01, 0.05), material=wood_mat, bevel_width=0.003))
+    addToDesk(create_cube("Desk_Footrest_Riser", (1.03, 0.52, 0.05), (0.4, 0.01, 0.05), material=wood_mat, bevel_width=0.003))
 
-    # Right-side Cabinet/Drawers Box Casing
-    addToDesk(create_cube("Desk_Drawers_Box", (1.535, 0.7, 0.36), (0.235, 0.29, 0.36), material=wood_mat, bevel_width=0.005))
+    # Right-side Cabinet/Drawers Box Casing (slimmed drawer casing width)
+    addToDesk(create_cube("Desk_Drawers_Box", (1.6, 0.7, 0.36), (0.16, 0.23, 0.36), material=wood_mat, bevel_width=0.005))
     # Top Drawer (Horizontal handle, key lock on the right side)
-    addToDesk(create_cube("Desk_Drawer_Top", (1.535, 0.405, 0.61), (0.23, 0.005, 0.08), material=wood_mat, bevel_width=0.004))
-    addToDesk(create_cube("Desk_Drawer_Handle_Top", (1.535, 0.395, 0.61), (0.05, 0.005, 0.006), material=metal_mat, bevel_width=0.002))
-    addToDesk(create_cylinder("Desk_Drawer_Lock", (1.7, 0.40, 0.66), radius=0.006, depth=0.005, rotation=(1.5708, 0, 0), material=metal_mat))
+    addToDesk(create_cube("Desk_Drawer_Top", (1.6, 0.475, 0.61), (0.155, 0.005, 0.08), material=wood_mat, bevel_width=0.004))
+    addToDesk(create_cube("Desk_Drawer_Handle_Top", (1.6, 0.465, 0.61), (0.04, 0.005, 0.006), material=metal_mat, bevel_width=0.002))
+    addToDesk(create_cylinder("Desk_Drawer_Lock", (1.71, 0.47, 0.66), radius=0.005, depth=0.005, rotation=(1.5708, 0, 0), material=metal_mat))
     # Bottom Cabinet Door (Vertical handle on the left side)
-    addToDesk(create_cube("Desk_Cabinet_Door", (1.535, 0.405, 0.265), (0.23, 0.005, 0.22), material=wood_mat, bevel_width=0.004))
-    addToDesk(create_cube("Desk_Cabinet_Handle", (1.35, 0.395, 0.265), (0.006, 0.005, 0.05), material=metal_mat, bevel_width=0.002))
+    addToDesk(create_cube("Desk_Cabinet_Door", (1.6, 0.475, 0.265), (0.155, 0.005, 0.22), material=wood_mat, bevel_width=0.004))
+    addToDesk(create_cube("Desk_Cabinet_Handle", (1.46, 0.465, 0.265), (0.006, 0.005, 0.05), material=metal_mat, bevel_width=0.002))
 
-    # 10. Office Mesh Chair (Centered to face the legroom cavity at Y = 0.95)
+    # 10. Office Mesh Chair (Centered to face the legroom cavity, shifted X by 0.2m)
     # Hub & cylinder
-    create_cube("Chair_Hub", (0.35, 0.95, 0.08), (0.04, 0.04, 0.02), material=black_plastic_mat, bevel_width=0.005)
+    create_cube("Chair_Hub", (0.55, 0.95, 0.08), (0.04, 0.04, 0.02), material=black_plastic_mat, bevel_width=0.005)
     for i in range(5):
         angle = i * 2 * math.pi / 5
-        lx = 0.35 + 0.22 * math.cos(angle)
+        lx = 0.55 + 0.22 * math.cos(angle)
         ly = 0.95 + 0.22 * math.sin(angle)
         leg = create_cube(f"Chair_Leg_{i}", (lx, ly, 0.08), (0.11, 0.02, 0.015), material=black_plastic_mat, bevel_width=0.004)
         leg.rotation_euler[2] = angle
         
         # Double wheels
-        wx1 = 0.35 + 0.28 * math.cos(angle) - 0.015 * math.sin(angle)
+        wx1 = 0.55 + 0.28 * math.cos(angle) - 0.015 * math.sin(angle)
         wy1 = 0.95 + 0.28 * math.sin(angle) + 0.015 * math.cos(angle)
         create_cylinder(f"Chair_Wheel_A_{i}", (wx1, wy1, 0.04), radius=0.03, depth=0.015, rotation=(1.5708, 0, angle), material=black_plastic_mat)
-        wx2 = 0.35 + 0.28 * math.cos(angle) + 0.015 * math.sin(angle)
+        wx2 = 0.55 + 0.28 * math.cos(angle) + 0.015 * math.sin(angle)
         wy2 = 0.95 + 0.28 * math.sin(angle) - 0.015 * math.cos(angle)
         create_cylinder(f"Chair_Wheel_B_{i}", (wx2, wy2, 0.04), radius=0.03, depth=0.015, rotation=(1.5708, 0, angle), material=black_plastic_mat)
         
-    create_cylinder("Chair_Cylinder", (0.35, 0.95, 0.24), radius=0.025, depth=0.18, material=metal_mat)
-    create_cylinder("Chair_Sheath", (0.35, 0.95, 0.16), radius=0.038, depth=0.08, material=black_plastic_mat)
+    create_cylinder("Chair_Cylinder", (0.55, 0.95, 0.24), radius=0.025, depth=0.18, material=metal_mat)
+    create_cylinder("Chair_Sheath", (0.55, 0.95, 0.16), radius=0.038, depth=0.08, material=black_plastic_mat)
     
     # Seat
-    create_cube("Chair_Seat", (0.35, 0.95, 0.43), (0.22, 0.22, 0.035), material=black_plastic_mat, bevel_width=0.01)
-    create_cube("Chair_Seat_BolsterL", (0.35, 1.16, 0.45), (0.22, 0.02, 0.02), material=black_plastic_mat, bevel_width=0.005)
-    create_cube("Chair_Seat_BolsterR", (0.35, 0.74, 0.45), (0.22, 0.02, 0.02), material=black_plastic_mat, bevel_width=0.005)
+    create_cube("Chair_Seat", (0.55, 0.95, 0.43), (0.22, 0.22, 0.035), material=black_plastic_mat, bevel_width=0.01)
+    create_cube("Chair_Seat_BolsterL", (0.55, 1.16, 0.45), (0.22, 0.02, 0.02), material=black_plastic_mat, bevel_width=0.005)
+    create_cube("Chair_Seat_BolsterR", (0.55, 0.74, 0.45), (0.22, 0.02, 0.02), material=black_plastic_mat, bevel_width=0.005)
     
     # Armrests
-    create_cube("Chair_Arm_Left_Support", (0.35, 1.18, 0.53), (0.015, 0.015, 0.08), material=black_plastic_mat, bevel_width=0.002)
-    create_cube("Chair_Arm_Left_Pad", (0.39, 1.18, 0.615), (0.1, 0.03, 0.015), material=black_plastic_mat, bevel_width=0.004)
-    create_cube("Chair_Arm_Right_Support", (0.35, 0.72, 0.53), (0.015, 0.015, 0.08), material=black_plastic_mat, bevel_width=0.002)
-    create_cube("Chair_Arm_Right_Pad", (0.39, 0.72, 0.615), (0.1, 0.03, 0.015), material=black_plastic_mat, bevel_width=0.004)
+    create_cube("Chair_Arm_Left_Support", (0.55, 1.18, 0.53), (0.015, 0.015, 0.08), material=black_plastic_mat, bevel_width=0.002)
+    create_cube("Chair_Arm_Left_Pad", (0.59, 1.18, 0.615), (0.1, 0.03, 0.015), material=black_plastic_mat, bevel_width=0.004)
+    create_cube("Chair_Arm_Right_Support", (0.55, 0.72, 0.53), (0.015, 0.015, 0.08), material=black_plastic_mat, bevel_width=0.002)
+    create_cube("Chair_Arm_Right_Pad", (0.59, 0.72, 0.615), (0.1, 0.03, 0.015), material=black_plastic_mat, bevel_width=0.004)
     
     # Mesh Backrest with border frame
-    create_cube("Chair_Back_Support", (0.12, 0.95, 0.56), (0.015, 0.025, 0.15), material=black_plastic_mat, bevel_width=0.004)
-    create_cube("Chair_Back_Frame_L", (0.14, 0.77, 0.75), (0.02, 0.015, 0.28), material=black_plastic_mat, bevel_width=0.006)
-    create_cube("Chair_Back_Frame_R", (0.14, 1.13, 0.75), (0.02, 0.015, 0.28), material=black_plastic_mat, bevel_width=0.006)
-    create_cube("Chair_Back_Frame_Top", (0.14, 0.95, 1.02), (0.02, 0.18, 0.015), material=black_plastic_mat, bevel_width=0.006)
-    create_cube("Chair_Back_Frame_Bot", (0.14, 0.95, 0.48), (0.02, 0.18, 0.015), material=black_plastic_mat, bevel_width=0.006)
-    create_cube("Chair_Back_Mesh", (0.145, 0.95, 0.75), (0.01, 0.17, 0.26), material=black_plastic_mat, bevel_width=0.0)
-    create_cube("Chair_Headrest", (0.14, 0.95, 1.08), (0.02, 0.13, 0.06), material=black_plastic_mat, bevel_width=0.01)
+    create_cube("Chair_Back_Support", (0.32, 0.95, 0.56), (0.015, 0.025, 0.15), material=black_plastic_mat, bevel_width=0.004)
+    create_cube("Chair_Back_Frame_L", (0.34, 0.77, 0.75), (0.02, 0.015, 0.28), material=black_plastic_mat, bevel_width=0.006)
+    create_cube("Chair_Back_Frame_R", (0.34, 1.13, 0.75), (0.02, 0.015, 0.28), material=black_plastic_mat, bevel_width=0.006)
+    create_cube("Chair_Back_Frame_Top", (0.34, 0.95, 1.02), (0.02, 0.18, 0.015), material=black_plastic_mat, bevel_width=0.006)
+    create_cube("Chair_Back_Frame_Bot", (0.34, 0.95, 0.48), (0.02, 0.18, 0.015), material=black_plastic_mat, bevel_width=0.006)
+    create_cube("Chair_Back_Mesh", (0.345, 0.95, 0.75), (0.01, 0.17, 0.26), material=black_plastic_mat, bevel_width=0.0)
+    create_cube("Chair_Headrest", (0.34, 0.95, 1.08), (0.02, 0.13, 0.06), material=black_plastic_mat, bevel_width=0.01)
 
     # 11. Props & Accessories (Repositioned to sit correctly on the 0.6m depth desk)
     # 11. Props & Accessories (Repositioned to sit correctly on the 0.6m depth desk)
@@ -849,11 +818,7 @@ def build_room():
     
     # Hollow Dustbin (Red bucket - on the right side of the wardrobe)
     create_hollow_bucket("RedBucket", (-0.1, 1.4, 0.15), radius=0.14, depth=0.28, material=red_bucket_mat)
-    for i in range(3):
-        tx = -0.1 + random.uniform(-0.04, 0.04)
-        ty = 1.4 + random.uniform(-0.04, 0.04)
-        tz = 0.22 + i * 0.03
-        create_cube(f"CrumpledPaper_{i}", (tx, ty, tz), (0.02, 0.02, 0.02), material=window_frame_mat, bevel_width=0.006)
+
 
     # 12. Neon LED Glow Strips (desk strip is parented to rotate with desk)
     addToDesk(create_cylinder("LEDStrip_Desk", (1.2, 0.7, 0.742), radius=0.005, depth=1.2, rotation=(1.5708, 0, 0), material=cyan_led_mat))
@@ -889,18 +854,29 @@ def build_room():
     bpy.context.scene.collection.objects.link(light_win)
     light_win.location = (-2.5, -0.5, 1.55)
     light_win.rotation_euler = (0.0, 1.5708, 0.0)
-    
+    # Subtle warm ambient floor glow under desk
     light_data_desk = bpy.data.lights.new(name="DeskGlow", type='POINT')
-    light_data_desk.energy = 120
-    light_data_desk.color = (1.0, 0.4, 0.05)
+    light_data_desk.energy = 25
+    light_data_desk.color = (1.0, 0.5, 0.1)
     light_desk = bpy.data.objects.new("DeskGlow", light_data_desk)
     bpy.context.scene.collection.objects.link(light_desk)
     light_desk.location = (1.2, 0.7, 0.22)
     light_desk.parent = desk_parent
     light_desk.matrix_parent_inverse = desk_parent.matrix_world.inverted()
     
+    # Logical Cozy Desk Lamp light casting light downwards onto the desk
+    light_data_lamp = bpy.data.lights.new(name="LampLight", type='POINT')
+    light_data_lamp.energy = 110
+    light_data_lamp.color = (1.0, 0.9, 0.75) # cozy warm white-yellow
+    light_lamp = bpy.data.objects.new("LampLight", light_data_lamp)
+    bpy.context.scene.collection.objects.link(light_lamp)
+    light_lamp.location = (1.32, 0.85, 1.04)
+    light_lamp.parent = desk_parent
+    light_lamp.matrix_parent_inverse = desk_parent.matrix_world.inverted()
+    
+    # Subtle accent glow under the bed
     light_data_bed = bpy.data.lights.new(name="BedGlow", type='POINT')
-    light_data_bed.energy = 90
+    light_data_bed.energy = 20
     light_data_bed.color = (1.0, 0.0, 0.4)
     light_bed = bpy.data.objects.new("BedGlow", light_data_bed)
     bpy.context.scene.collection.objects.link(light_bed)
@@ -918,7 +894,7 @@ def build_room():
     # 15. Render Engine Configuration
     bpy.context.scene.render.engine = 'CYCLES'
     bpy.context.scene.cycles.use_denoising = True
-    bpy.context.scene.cycles.samples = 512
+    bpy.context.scene.cycles.samples = 96
     bpy.context.scene.cycles.preview_samples = 256
     
     # Enable Viewport Denoising

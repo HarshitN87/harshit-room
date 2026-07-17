@@ -58,11 +58,18 @@ loader.load(
         roomModel = gltf.scene;
         
         // Traverse and apply settings
+        const maxAnisotropy = renderer.capabilities.getMaxAnisotropy();
         roomModel.traverse((child) => {
             if (child.isMesh) {
                 // Ensure the baked material renders unlit and colors pop perfectly
                 if (child.material) {
                     child.material.toneMapped = false;
+                    if (child.material.map) {
+                        child.material.map.anisotropy = maxAnisotropy;
+                        child.material.map.minFilter = THREE.LinearMipmapLinearFilter;
+                        child.material.map.magFilter = THREE.LinearFilter;
+                        child.material.map.needsUpdate = true;
+                    }
                 }
             }
         });

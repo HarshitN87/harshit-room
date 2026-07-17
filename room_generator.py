@@ -882,14 +882,40 @@ def build_room():
     bpy.context.scene.collection.objects.link(light_bed)
     light_bed.location = (-1.25, -0.35, 0.12)
     
-    light_data_top = bpy.data.lights.new(name="TopLight", type='AREA')
-    light_data_top.energy = 35.0
-    light_data_top.color = (1.0, 0.98, 0.94)
-    light_data_top.size = 4.5
-    light_top = bpy.data.objects.new("TopLight", light_data_top)
-    bpy.context.scene.collection.objects.link(light_top)
-    light_top.location = (0.0, 0.0, 4.5)
-    light_top.rotation_euler = (3.14159, 0.0, 0.0)
+    # Wall sconce on the back wall (Y = 1.99), centered at X = 0.2, height = 1.9m
+    # Sconce back plate (flat disc against wall)
+    sconce_plate_mat = create_simple_material("SconceMetalMat", (0.6, 0.55, 0.5, 1.0), roughness=0.25, metallic=0.9)
+    sconce_bulb_mat  = create_simple_material("SconceBulbMat",  (1.0, 0.95, 0.8, 1.0), roughness=0.05,
+                                               emission=(1.0, 0.9, 0.6, 1.0), emission_strength=12.0)
+    # Back plate
+    create_cube("Sconce_Plate", (0.2, 1.97, 1.9), (0.06, 0.01, 0.09), material=sconce_plate_mat, bevel_width=0.005)
+    # Arm sticking outward from wall
+    create_cube("Sconce_Arm",   (0.2, 1.88, 1.9), (0.008, 0.09, 0.008), material=sconce_plate_mat, bevel_width=0.002)
+    # Bulb (glowing cylinder)
+    create_cylinder("Sconce_Bulb", (0.2, 1.80, 1.9), radius=0.025, depth=0.05,
+                    rotation=(1.5708, 0, 0), material=sconce_bulb_mat)
+    # Small shade cup around the bulb
+    create_cylinder("Sconce_Shade", (0.2, 1.78, 1.9), radius=0.045, depth=0.06,
+                    rotation=(1.5708, 0, 0), material=sconce_plate_mat)
+
+    # Warm point light at the bulb position, casting forward into the room
+    light_data_sconce = bpy.data.lights.new(name="WallSconceLight", type='POINT')
+    light_data_sconce.energy = 120
+    light_data_sconce.color = (1.0, 0.88, 0.65)   # warm incandescent tone
+    light_data_sconce.shadow_soft_size = 0.05
+    light_sconce = bpy.data.objects.new("WallSconceLight", light_data_sconce)
+    bpy.context.scene.collection.objects.link(light_sconce)
+    light_sconce.location = (0.2, 1.75, 1.9)      # just in front of the bulb
+
+    # Gentle ambient fill so shadows aren't pitch-black
+    light_data_fill = bpy.data.lights.new(name="AmbientFill", type='AREA')
+    light_data_fill.energy = 12.0
+    light_data_fill.color = (0.9, 0.92, 1.0)
+    light_data_fill.size = 5.0
+    light_fill = bpy.data.objects.new("AmbientFill", light_data_fill)
+    bpy.context.scene.collection.objects.link(light_fill)
+    light_fill.location = (0.0, 0.0, 4.5)
+    light_fill.rotation_euler = (3.14159, 0.0, 0.0)
 
     # 15. Render Engine Configuration
     bpy.context.scene.render.engine = 'CYCLES'

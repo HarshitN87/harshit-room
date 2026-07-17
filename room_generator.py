@@ -644,22 +644,22 @@ def build_room():
     create_cylinder("Wardrobe_KeyShaft", (-0.95, 1.41, 1.15), radius=0.0018, depth=0.025, rotation=(1.5708, 0, 0), material=metal_mat)
     create_cylinder("Wardrobe_KeyHead", (-0.95, 1.395, 1.15), radius=0.006, depth=0.003, rotation=(1.5708, 0, 0), material=metal_mat)
 
-    # 8. Bed & Bedding (standard Indian double: 1.1m width x 2.1m length, no headboard)
-    create_cube("BedFrame_SideR", (-0.69, -0.3, 0.175), (0.02, 1.05, 0.175), material=wood_mat, bevel_width=0.01)
-    create_cube("BedFrame_SideL", (-1.79, -0.3, 0.175), (0.02, 1.05, 0.175), material=wood_mat, bevel_width=0.01)
-    create_cube("BedFrame_Front", (-1.24, -1.35, 0.175), (0.55, 0.02, 0.175), material=wood_mat, bevel_width=0.01)
-    # No headboard per user request
+    # 8. Bed & Bedding (1:1.33 ratio - 1.5m wide x 2.0m long, no headboard)
+    create_cube("BedFrame_SideR", (-0.49, -0.3, 0.175), (0.02, 1.0, 0.175), material=wood_mat, bevel_width=0.01)
+    create_cube("BedFrame_SideL", (-1.99, -0.3, 0.175), (0.02, 1.0, 0.175), material=wood_mat, bevel_width=0.01)
+    create_cube("BedFrame_Front", (-1.24, -1.3, 0.175), (0.75, 0.02, 0.175), material=wood_mat, bevel_width=0.01)
+    # No headboard
     
     # Mattress
-    create_cube("Mattress", (-1.24, -0.3, 0.36), (0.53, 1.03, 0.09), material=bedsheet_mat, bevel_width=0.02)
-    # Pillows on the curtain/window side (left side of bed, near X=-1.79)
-    p1 = create_cube("Pillow_1", (-1.69, 0.55, 0.45), (0.15, 0.22, 0.035), material=slate_pillow_mat, bevel_width=0.015)
+    create_cube("Mattress", (-1.24, -0.3, 0.36), (0.73, 0.98, 0.09), material=bedsheet_mat, bevel_width=0.02)
+    # Pillows on curtain/window side (left wall), centered in their zone
+    p1 = create_cube("Pillow_1", (-1.72, 0.5, 0.45), (0.15, 0.22, 0.035), material=slate_pillow_mat, bevel_width=0.015)
     p1.rotation_euler = (0.05, 0.0, 0.06)
-    p2 = create_cube("Pillow_2", (-1.69, 0.15, 0.45), (0.15, 0.22, 0.035), material=slate_pillow_mat, bevel_width=0.015)
+    p2 = create_cube("Pillow_2", (-1.72, 0.18, 0.45), (0.15, 0.22, 0.035), material=slate_pillow_mat, bevel_width=0.015)
     p2.rotation_euler = (0.05, 0.0, -0.06)
     # Draped blankets
-    create_cube("Blanket_Purple_Top", (-1.24, -0.2, 0.42), (0.53, 0.75, 0.02), material=purple_blanket_mat, bevel_width=0.015)
-    create_cube("Blanket_Purple_Drape", (-0.69, -0.2, 0.285), (0.01, 0.75, 0.135), material=purple_blanket_mat, bevel_width=0.015)
+    create_cube("Blanket_Purple_Top", (-1.24, -0.2, 0.42), (0.73, 0.78, 0.02), material=purple_blanket_mat, bevel_width=0.015)
+    create_cube("Blanket_Purple_Drape", (-0.49, -0.2, 0.285), (0.01, 0.78, 0.135), material=purple_blanket_mat, bevel_width=0.015)
 
 
 
@@ -816,8 +816,7 @@ def build_room():
     create_hollow_bucket("RedBucket", (-0.1, 1.4, 0.15), radius=0.14, depth=0.28, material=red_bucket_mat)
 
 
-    # 12. Neon LED Glow Strips (desk strip is parented to rotate with desk)
-    addToDesk(create_cylinder("LEDStrip_Desk", (1.2, 0.7, 0.742), radius=0.005, depth=1.2, rotation=(1.5708, 0, 0), material=cyan_led_mat))
+    # LED desk strip removed (was causing visible green beam)
     create_cylinder("LEDStrip_BackWall", (0.0, 1.98, 0.04), radius=0.005, depth=2.0, rotation=(0, 1.5708, 0), material=pink_led_mat)
 
     # Rotate the entire desk group (including all its drawers, panels, and props) by -90 degrees around Z axis so it faces X-

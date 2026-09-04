@@ -1,16 +1,8 @@
-"""Harshit Room — Bruno-Simon-grade detailed diorama generator.
-Constraint honored: NO new furniture/object categories. Every added mesh is a
-sub-detail part of an already-present component (prefixed with its parent name).
+"""Harshit Room — RETIRED Blender pipeline (kept for provenance).
 
-Detail bar targeted (Bruno Simon / my-room-in-3d):
-  soft bevels everywhere, seams/gaps/piping, screws/rings/ribs, layered
-  materials with grain/weave bump + roughness variation, glass/liquid/inner
-  walls, cables/springs/filaments, baked AO + soft shadows at 4K.
-
-Run inside Blender:  blender --background --python room_generator.py
-Outputs (relative to this file, portable for GitHub/Vercel):
-  room_model.glb / room_model.fbx / room_render.png
-  public/room_baked_combined.glb + public/room_baked_combined.png
+The project now builds 100% procedurally in Three.js on the room-3d-mvp
+pipeline (see src/components/ + README). This script is no longer used to
+produce the site and is kept only as a modelling reference.
 """
 import bpy
 import math

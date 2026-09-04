@@ -1,10 +1,11 @@
-import { defineConfig } from 'vite';
+import { defineConfig } from 'vite'
 
 export default defineConfig({
+  base: './',
   publicDir: 'public',
   build: {
     outDir: 'dist',
-    assetsDir: 'assets',
-    sourcemap: false
+    assetsInlineLimit: 0,
+    chunkSizeWarningLimit: 1200
   }
-});
+})

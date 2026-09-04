@@ -1,208 +1,245 @@
-import * as THREE from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import * as THREE from 'three'
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
+import * as M from './components/materials.js'
+import { laptopScreenTex, glowTex } from './components/materials.js'
+import { makeHelpers } from './components/helpers.js'
+import { buildShell } from './components/shell.js'
+import { buildWindowWall } from './components/windowWall.js'
+import { buildDoor } from './components/door.js'
+import { buildWardrobe } from './components/wardrobe.js'
+import { buildBed } from './components/bed.js'
+import { buildDesk } from './components/desk.js'
+import { buildChair } from './components/chair.js'
 
-/* Bruno-Simon-grade viewer for the baked room diorama.
-   - Baked 4K GLB stays the visual truth (unlit, toneMapped=false)
-   - Thin dynamic layer on top: dust motes, breathing glow lights,
-     camera focus presets, polished loader + UI. No new furniture. */
+/* Harshit Room in 3D on the room-3d-mvp pipeline: fully procedural,
+   no Blender bake step. Same furniture as before, Bruno-style light rig,
+   day/night mix, clickable lamp + laptop screen + pendant. */
 
-const container = document.getElementById('canvas-container');
-const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x0b0c10);
-scene.fog = new THREE.Fog(0x0b0c10, 18, 34);
+const canvas = document.getElementById('scene')
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true })
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+renderer.setSize(window.innerWidth, window.innerHeight)
+renderer.shadowMap.enabled = true
+renderer.shadowMap.type = THREE.PCFSoftShadowMap
+renderer.outputColorSpace = THREE.SRGBColorSpace
+renderer.toneMapping = THREE.ACESFilmicToneMapping
+renderer.toneMappingExposure = 1.05
 
-const aspect = window.innerWidth / window.innerHeight;
-const frustumSize = 4.5;
-const camera = new THREE.OrthographicCamera(
-  -frustumSize * aspect, frustumSize * aspect,
-  frustumSize, -frustumSize, 0.1, 100
-);
-const HOME_POS = new THREE.Vector3(6, 6, 6);
-const HOME_TGT = new THREE.Vector3(0, 0.4, 0);
-camera.position.copy(HOME_POS);
-camera.lookAt(HOME_TGT);
+const scene = new THREE.Scene()
+const DAY_BG = new THREE.Color(0x2a2e3a)
+const NIGHT_BG = new THREE.Color(0x0e1016)
+scene.background = DAY_BG.clone()
+scene.fog = new THREE.Fog(scene.background.clone(), 16, 32)
 
-const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
-renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.05;
-renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-container.appendChild(renderer.domElement);
+const W = 4, D = 4, H = 3
 
-const controls = new OrbitControls(camera, renderer.domElement);
-controls.enableDamping = true;
-controls.dampingFactor = 0.06;
-controls.maxPolarAngle = Math.PI / 2 - 0.05;
-controls.minZoom = 0.6;
-controls.maxZoom = 4;
-controls.target.copy(HOME_TGT);
+const camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 0.1, 100)
+camera.position.set(7.6, 5.4, -3.4)
 
-// Soft fill so back-faces never go pitch black (baked texture does the rest)
-scene.add(new THREE.AmbientLight(0xffffff, 0.18));
+const controls = new OrbitControls(camera, renderer.domElement)
+controls.target.set(-0.1, 0.8, 0)
+window.__room = { scene, camera, controls, W, D, H }
+controls.enableDamping = true
+controls.dampingFactor = 0.06
+controls.minDistance = 3.2
+controls.maxDistance = 12
+controls.minPolarAngle = 0.15
+controls.maxPolarAngle = 1.45
+controls.enablePan = false
+controls.autoRotate = true
+controls.autoRotateSpeed = 0.55
+renderer.domElement.addEventListener('pointerdown', () => { controls.autoRotate = false }, { once: true })
 
-// Living-glow rig: very low intensities, only to make emissives breathe
-const lampGlow = new THREE.PointLight(0xffd9a0, 4, 4, 2);
-lampGlow.position.set(0.4, 1.6, -0.9);
-scene.add(lampGlow);
-const screenGlow = new THREE.PointLight(0x4db8ff, 2.2, 3, 2);
-screenGlow.position.set(0.1, 1.2, -0.6);
-scene.add(screenGlow);
-const ledGlow = new THREE.PointLight(0xff2f6d, 1.6, 5, 2);
-ledGlow.position.set(0, 0.6, 1.6);
-scene.add(ledGlow);
-const ceilingGlow = new THREE.PointLight(0xffe6b0, 3, 6, 2);
-ceilingGlow.position.set(-1.5, 2.5, -0.5);
-scene.add(ceilingGlow);
+/* ============================== lights =================================== */
+const hemi = new THREE.HemisphereLight(0xfff6e8, 0x3a3f52, 0.95)
+scene.add(hemi)
+const sun = new THREE.DirectionalLight(0xfff1d6, 1.7)
+sun.position.set(4, 6.5, 3)
+sun.castShadow = true
+sun.shadow.mapSize.set(2048, 2048)
+sun.shadow.bias = -0.0004
+sun.shadow.normalBias = 0.02
+Object.assign(sun.shadow.camera, { left: -6, right: 6, top: 6, bottom: -6, near: 1, far: 20 })
+scene.add(sun)
+const fill = new THREE.DirectionalLight(0xbfd4ff, 0.45)
+fill.position.set(-5, 3.5, 4)
+scene.add(fill)
+const warm = new THREE.PointLight(0xffd9a0, 3, 10, 1.8)
+warm.position.set(0.25, 1.9, 0.1)
+scene.add(warm)
+const pinkWash = new THREE.PointLight(0xff5c9a, 4, 7, 1.9)
+pinkWash.position.set(-0.3, 1.9, 1.1)
+scene.add(pinkWash)
+const cyanWash = new THREE.PointLight(0x5cc8ff, 3, 7, 1.9)
+cyanWash.position.set(1.2, 1.7, 0.6)
+scene.add(cyanWash)
+const ceilingGlow = new THREE.PointLight(0xffe0ae, 4, 6, 1.9)
+ceilingGlow.position.set(-1.5, 2.45, -0.5)
+scene.add(ceilingGlow)
+scene.add(new THREE.AmbientLight(0xffffff, 0.15))
 
-// Floating dust motes (atmosphere only, Bruno-style)
-const MOTES = 220;
-const moteGeo = new THREE.BufferGeometry();
-const motePos = new Float32Array(MOTES * 3);
-const moteSeed = new Float32Array(MOTES);
-for (let i = 0; i < MOTES; i++) {
-  motePos[i * 3] = (Math.random() - 0.5) * 6;
-  motePos[i * 3 + 1] = Math.random() * 3.2;
-  motePos[i * 3 + 2] = (Math.random() - 0.5) * 6;
-  moteSeed[i] = Math.random() * Math.PI * 2;
+/* ====================== compose the room components ====================== */
+const { box, rbox, aoBlob } = makeHelpers(scene)
+const ctx = { M, box, rbox, aoBlob, W, D, H }
+const shell = buildShell(scene, ctx)
+const win = buildWindowWall(scene, ctx, shell)
+buildDoor(scene, ctx, shell)
+buildWardrobe(scene, ctx, shell)
+buildBed(scene, ctx)
+const desk = buildDesk(scene, ctx)
+buildChair(scene, ctx)
+
+/* ==================== dust motes (Bruno atmosphere) ====================== */
+const DUST = 220
+const dustGeo = new THREE.BufferGeometry()
+const dpos = new Float32Array(DUST * 3)
+const dseed = new Float32Array(DUST)
+for (let i = 0; i < DUST; i++) {
+  dpos[i * 3] = (Math.random() - 0.5) * W
+  dpos[i * 3 + 1] = Math.random() * H
+  dpos[i * 3 + 2] = (Math.random() - 0.5) * D
+  dseed[i] = Math.random() * 100
 }
-moteGeo.setAttribute('position', new THREE.BufferAttribute(motePos, 3));
-const moteMat = new THREE.PointsMaterial({
-  color: 0xbfd9ff, size: 0.02, transparent: true, opacity: 0.35,
-  depthWrite: false, sizeAttenuation: true
-});
-const motes = new THREE.Points(moteGeo, moteMat);
-scene.add(motes);
+dustGeo.setAttribute('position', new THREE.BufferAttribute(dpos, 3))
+const dust = new THREE.Points(dustGeo, new THREE.PointsMaterial({
+  map: glowTex, color: 0xffe9c4, size: 0.035, transparent: true, opacity: 0.35,
+  depthWrite: false, blending: THREE.AdditiveBlending, sizeAttenuation: true
+}))
+scene.add(dust)
 
-// Loader
-const loader = new GLTFLoader();
-const loaderPercent = document.getElementById('loader-percent');
-const loaderBar = document.getElementById('loader-bar');
-const loaderOverlay = document.getElementById('loader');
-
-let roomModel = null;
-let autoRotate = false;
-let focusTween = null;
-
-loader.load(
-  '/room_baked_combined.glb',
-  (gltf) => {
-    roomModel = gltf.scene;
-    const maxAnisotropy = renderer.capabilities.getMaxAnisotropy();
-    roomModel.traverse((child) => {
-      if (child.isMesh) {
-        child.castShadow = false;
-        child.receiveShadow = false;
-        if (child.material) {
-          child.material.toneMapped = false;
-          if (child.material.map) {
-            child.material.map.anisotropy = maxAnisotropy;
-            child.material.map.minFilter = THREE.LinearMipmapLinearFilter;
-            child.material.map.magFilter = THREE.LinearFilter;
-            child.material.map.needsUpdate = true;
-          }
-        }
-      }
-    });
-    roomModel.position.set(0, 0, 0);
-    scene.add(roomModel);
-    loaderOverlay.style.opacity = '0';
-    setTimeout(() => { loaderOverlay.style.display = 'none'; }, 650);
-    document.getElementById('ui-container')?.classList.add('ready');
-  },
-  (xhr) => {
-    if (xhr.total > 0) {
-      const percent = Math.round((xhr.loaded / xhr.total) * 100);
-      loaderPercent.textContent = `LOADING 3D ROOM — ${percent}%`;
-      if (loaderBar) loaderBar.style.width = `${percent}%`;
-    }
-  },
-  (error) => {
-    console.error('Error loading GLB:', error);
-    loaderPercent.textContent = 'ERROR LOADING MODEL — run `npm run dev` and keep public/room_baked_combined.glb in place';
-  }
-);
-
-// Camera focus presets (viewer UX only — camera moves, model untouched)
-const PRESETS = {
-  home: { pos: [6, 6, 6], tgt: [0, 0.4, 0] },
-  desk: { pos: [3.4, 3.2, 3.4], tgt: [0.5, 0.8, -0.4] },
-  bed: { pos: [-4.2, 3.4, 3.2], tgt: [-1.2, 0.4, -0.3] },
-  wardrobe: { pos: [1.8, 3.0, 5.2], tgt: [-1.0, 1.2, 1.4] },
-  window: { pos: [-5.2, 2.6, 1.6], tgt: [-1.9, 1.4, -0.5] }
-};
-function flyTo(name) {
-  const p = PRESETS[name];
-  if (!p) return;
-  focusTween = {
-    t: 0,
-    fromPos: camera.position.clone(),
-    toPos: new THREE.Vector3(...p.pos),
-    fromTgt: controls.target.clone(),
-    toTgt: new THREE.Vector3(...p.tgt)
-  };
-  document.querySelectorAll('[data-focus]').forEach((b) =>
-    b.classList.toggle('active', b.dataset.focus === name));
+/* ================= night mix (Bruno uNightMix homage) ==================== */
+let lampOn = true
+let screenOn = true
+let lightOn = true
+let nightMix = 0.85
+const sunDay = 1.7, hemiDay = 0.95
+function applyNightMix(v) {
+  nightMix = THREE.MathUtils.clamp(v, 0, 1)
+  scene.background.copy(DAY_BG).lerp(NIGHT_BG, nightMix)
+  scene.fog.color.copy(scene.background)
+  sun.intensity = sunDay * (1 - nightMix * 0.85)
+  hemi.intensity = hemiDay * (1 - nightMix * 0.6)
+  fill.intensity = 0.45 * (1 - nightMix * 0.4)
+  if (lightOn) ceilingGlow.intensity = 4 * (0.3 + nightMix * 0.85)
+  pinkWash.intensity = 1.2 + nightMix * 4.2
+  cyanWash.intensity = 0.8 + nightMix * 2.2
+  if (lampOn) desk.lampGlow.intensity = 0.8 + nightMix * 3.0
+  if (screenOn) desk.screenGlow.intensity = 0.5 + nightMix * 1.6
+  shell.ledGlow.intensity = 0.8 + nightMix * 3.0
+  win.nightGlass.material.opacity = 0.55 + nightMix * 0.35
 }
-document.querySelectorAll('[data-focus]').forEach((b) =>
-  b.addEventListener('click', () => flyTo(b.dataset.focus)));
-document.getElementById('btn-rotate')?.addEventListener('click', (e) => {
-  autoRotate = !autoRotate;
-  e.currentTarget.classList.toggle('active', autoRotate);
-});
-document.getElementById('btn-reset')?.addEventListener('click', () => flyTo('home'));
+window.setNightMix = applyNightMix
+applyNightMix(0.85)
 
+/* ============================== interaction ============================== */
+const ray = new THREE.Raycaster(), ptr = new THREE.Vector2()
+const toast = document.getElementById('toast')
+let toastTimer = 0
+function showToast(msg) {
+  toast.textContent = msg; toast.classList.remove('hidden')
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => toast.classList.add('hidden'), 1400)
+}
+function setLamp(on, silent) {
+  lampOn = on
+  desk.lampBulbMat.emissiveIntensity = on ? 2.4 : 0.05
+  desk.lampSprite.material.opacity = on ? 0.5 : 0.04
+  desk.lampGlow.intensity = on ? (0.8 + nightMix * 3.0) : 0
+  if (!silent) showToast(on ? 'Lamp on' : 'Lamp off')
+}
+function setScreen(on, silent) {
+  screenOn = on
+  desk.laptopScreen.material.map = laptopScreenTex(on)
+  desk.laptopScreen.material.emissiveMap = on ? desk.laptopScreen.material.map : null
+  desk.laptopScreen.material.emissiveIntensity = on ? 0.85 : 0
+  desk.laptopScreen.material.needsUpdate = true
+  desk.screenGlow.intensity = on ? (0.5 + nightMix * 1.6) : 0
+  if (!silent) showToast(on ? 'Laptop on' : 'Laptop off')
+}
+function setLight(on) {
+  lightOn = on
+  applyNightMix(nightMix)
+  M.warmBulbMat.emissiveIntensity = on ? 2.4 : 0.05
+  shell.bulbGlow.material.opacity = on ? 0.45 : 0.04
+  if (!on) ceilingGlow.intensity = 0
+  showToast(on ? 'Pendant on' : 'Pendant off')
+}
+const clickables = [desk.lampBulb, desk.laptopScreen, shell.bulbMesh]
+function pick(e) {
+  ptr.x = (e.clientX / window.innerWidth) * 2 - 1
+  ptr.y = -(e.clientY / window.innerHeight) * 2 + 1
+  ray.setFromCamera(ptr, camera)
+  const hit = ray.intersectObjects(clickables, false)[0]
+  return hit ? hit.object : null
+}
+renderer.domElement.addEventListener('pointermove', (e) => {
+  const o = pick(e)
+  renderer.domElement.style.cursor = o ? 'pointer' : 'grab'
+})
+renderer.domElement.addEventListener('click', (e) => {
+  const o = pick(e)
+  if (o === desk.lampBulb) setLamp(!lampOn)
+  else if (o === desk.laptopScreen) setScreen(!screenOn)
+  else if (o === shell.bulbMesh) setLight(!lightOn)
+})
+document.getElementById('chip-lamp').onclick = () => setLamp(!lampOn)
+document.getElementById('chip-screen').onclick = () => setScreen(!screenOn)
+document.getElementById('chip-light').onclick = () => setLight(!lightOn)
+document.getElementById('chip-daynight').onclick = (e) => {
+  const to = nightMix > 0.5 ? 0.15 : 0.9
+  applyNightMix(to)
+  e.currentTarget.textContent = nightMix > 0.5 ? '☀️ Day' : '🌙 Night'
+  showToast(nightMix > 0.5 ? 'Night mode' : 'Day mode')
+}
+
+/* ================================= loop ================================== */
 window.addEventListener('resize', () => {
-  const na = window.innerWidth / window.innerHeight;
-  camera.left = -frustumSize * na;
-  camera.right = frustumSize * na;
-  camera.top = frustumSize;
-  camera.bottom = -frustumSize;
-  camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth, window.innerHeight);
-});
-
-const clock = new THREE.Clock();
-const easeInOut = (t) => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
-
-function animate() {
-  requestAnimationFrame(animate);
-  const delta = Math.min(clock.getDelta(), 0.05);
-  const time = clock.elapsedTime;
-
-  if (focusTween) {
-    focusTween.t += delta / 1.1;
-    const k = easeInOut(Math.min(focusTween.t, 1));
-    camera.position.lerpVectors(focusTween.fromPos, focusTween.toPos, k);
-    controls.target.lerpVectors(focusTween.fromTgt, focusTween.toTgt, k);
-    if (focusTween.t >= 1) focusTween = null;
-  } else if (autoRotate && !reduceMotion) {
-    const r = camera.position.clone().sub(controls.target);
-    const angle = delta * 0.25;
-    const cos = Math.cos(angle), sin = Math.sin(angle);
-    const x = r.x * cos - r.z * sin, z = r.x * sin + r.z * cos;
-    camera.position.set(controls.target.x + x, camera.position.y, controls.target.z + z);
-  }
-
-  // breathing glows — subtle, never fights the bake
-  if (!reduceMotion) {
-    lampGlow.intensity = 4 + Math.sin(time * 2.1) * 0.35;
-    screenGlow.intensity = 2.2 + Math.sin(time * 1.3 + 1) * 0.3;
-    ledGlow.intensity = 1.6 + Math.sin(time * 0.9 + 2) * 0.25;
-    ceilingGlow.intensity = 3 + Math.sin(time * 1.7) * 0.2;
-    const p = moteGeo.attributes.position.array;
-    for (let i = 0; i < MOTES; i++) {
-      p[i * 3 + 1] += Math.sin(time * 0.4 + moteSeed[i]) * 0.0006 + 0.0009;
-      p[i * 3] += Math.cos(time * 0.25 + moteSeed[i]) * 0.0005;
-      if (p[i * 3 + 1] > 3.4) p[i * 3 + 1] = 0;
-    }
-    moteGeo.attributes.position.needsUpdate = true;
-  }
-
-  controls.update();
-  renderer.render(scene, camera);
+  camera.aspect = window.innerWidth / window.innerHeight
+  camera.updateProjectionMatrix()
+  renderer.setSize(window.innerWidth, window.innerHeight)
+})
+const camStart = camera.position.clone(), camEnd = new THREE.Vector3(5.0, 3.5, -2.4)
+let intro = 0
+window.__snapView = (px, py, pz, tx, ty, tz) => {
+  intro = 1
+  controls.autoRotate = false
+  camera.position.set(px, py, pz)
+  controls.target.set(tx, ty, tz)
+  camera.lookAt(controls.target)
+  controls.update()
 }
-animate();
+const clock = new THREE.Clock()
+let firstFrame = true
+renderer.setAnimationLoop(() => {
+  const dt = Math.min(clock.getDelta(), 0.05), t = clock.elapsedTime
+  if (intro < 1) {
+    intro = Math.min(1, intro + dt / 2.4)
+    const k = 1 - Math.pow(1 - intro, 3)
+    camera.position.lerpVectors(camStart, camEnd, k)
+  }
+  win.waveCurtains(t, 0.35)
+  if (screenOn) desk.screenGlow.intensity = (0.5 + nightMix * 1.6) * (1 + Math.sin(t * 2.2) * 0.06)
+  if (lampOn) desk.lampGlow.intensity = (0.8 + nightMix * 3.0) * (1 + Math.sin(t * 7.7) * 0.02)
+  const dp = dust.geometry.attributes.position
+  for (let i = 0; i < DUST; i++) {
+    dp.array[i * 3 + 1] += Math.sin(t * 0.5 + dseed[i]) * 0.0006 + 0.0004
+    dp.array[i * 3] += Math.cos(t * 0.3 + dseed[i]) * 0.0005
+    if (dp.array[i * 3 + 1] > H) dp.array[i * 3 + 1] = 0
+    if (dp.array[i * 3] > W / 2) dp.array[i * 3] = -W / 2
+  }
+  dp.needsUpdate = true
+  dust.material.opacity = 0.22 + nightMix * 0.25
+  controls.update()
+  renderer.render(scene, camera)
+  if (firstFrame) {
+    firstFrame = false
+    document.getElementById('loader').classList.add('done')
+    canvas.classList.add('ready')
+  }
+})
+
+requestAnimationFrame(() => requestAnimationFrame(() => {
+  const l = document.getElementById('loader')
+  const s = document.getElementById('scene')
+  if (l) l.classList.add('done')
+  if (s) s.classList.add('ready')
+}))

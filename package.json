@@ -1,16 +1,17 @@
 {
   "name": "cozy-room-3d",
   "version": "1.0.0",
-  "description": "WebGL Interactive 3D Room Viewer",
+  "description": "Harshit Room in 3D — procedural Three.js diorama on the room-3d-mvp pipeline",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview"
   },
   "dependencies": {
-    "three": "^0.160.0"
+    "three": "^0.185.1"
   },
   "devDependencies": {
-    "vite": "^5.0.0"
-  }
+    "vite": "^8.2.2"
+  },
+  "type": "module"
 }

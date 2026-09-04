@@ -9,7 +9,7 @@ import { laptopScreenTex, glowTex } from './materials.js'
 export function buildDesk(scene, ctx) {
   const { M, box, rbox, aoBlob } = ctx
   const g = new THREE.Group(); g.name = 'desk'
-  g.position.set(1.2, 0, 0.3); g.rotation.y = -Math.PI / 2
+  g.position.set(1.55, 0, 0.3); g.rotation.y = -Math.PI / 2
   scene.add(g)
   function dbox(w, h, d, mat, x, y, z) {
     const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat)
@@ -203,6 +203,6 @@ export function buildDesk(scene, ctx) {
     hmb(new THREE.CylinderGeometry(0.002, 0.004, 0.014, 8), M.chromeMat, pen.position.x, 0.045, pen.position.z).rotation.copy(pen.rotation)
   })
 
-  aoBlob(1.0, 2.0, 1.2, 0.3, 0.005, 0.9)
+  aoBlob(1.0, 2.0, 1.55, 0.3, 0.005, 0.9)
   return { lampBulb, lampBulbMat, lampSprite, lampGlow, laptopScreen, screenMat, screenGlow }
 }

@@ -14,7 +14,7 @@ export function buildChair(scene, ctx) {
   const weltMat = new THREE.MeshStandardMaterial({ color: 0x3a3b42, roughness: 0.8 })
   const stitchMat = new THREE.MeshStandardMaterial({ color: 0x8a8b93, roughness: 0.8 })
   const g = new THREE.Group(); g.name = 'chair'
-  g.position.set(0.35, 0, 0.35); g.rotation.y = Math.PI / 2
+  g.position.set(0.72, 0, 0.35); g.rotation.y = Math.PI / 2
   scene.add(g)
   function cbox(w, h, d, mat, x, y, z) {
     const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat)
@@ -123,5 +123,5 @@ export function buildChair(scene, ctx) {
   brbox(0.32, 0.15, 0.09, 0.04, fabric, 0, 0.86, 0.0)
   bbox(0.28, 0.014, 0.014, weltMat, 0, 0.795, 0.045).castShadow = false
 
-  aoBlob(1.0, 1.0, 0.35, 0.35, 0.005, 0.9)
+  aoBlob(1.0, 1.0, 0.72, 0.35, 0.005, 0.9)
 }

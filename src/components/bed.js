@@ -7,8 +7,8 @@ import { sheetTex } from './materials.js'
    purple blanket with fold ridges + pleated east drape (same fitting). */
 export function buildBed(scene, ctx) {
   const { M, box, rbox, aoBlob } = ctx
-  const BW = 1.8, BL = 2.4 // width (x), length (z)
-  const g = new THREE.Group(); g.name = 'bed'; g.position.set(-1.05, 0, 0.25); scene.add(g)
+  const BW = 2.2, BL = 2.4 // width (x), length (z) — stretched east toward the chair
+  const g = new THREE.Group(); g.name = 'bed'; g.position.set(-0.85, 0, 0.25); scene.add(g)
   function bbox(w, h, d, mat, x, y, z) {
     const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat)
     m.position.set(x, y, z); m.castShadow = m.receiveShadow = true; g.add(m); return m
@@ -40,7 +40,7 @@ export function buildBed(scene, ctx) {
   bbox(0.02, 0.02, ML, welt, MW / 2, 0.45, 0).castShadow = false
   for (let i = 0; i < 8; i++) {
     const b = new THREE.Mesh(new THREE.SphereGeometry(0.013, 10, 8), welt)
-    b.scale.set(1, 0.5, 1); b.position.set(-0.55 + (i % 4) * 0.37, 0.545, i < 4 ? -0.35 : 0.35); g.add(b)
+    b.scale.set(1, 0.5, 1); b.position.set(-0.70 + (i % 4) * 0.47, 0.545, i < 4 ? -0.35 : 0.35); g.add(b)
   }
 
   // sculpted pillows (west end)
@@ -68,8 +68,8 @@ export function buildBed(scene, ctx) {
     dimple.scale.set(1, 0.4, 1); dimple.position.y = 0.095; grp.add(dimple)
     g.add(grp)
   }
-  pillow(M.slateMat, -0.5, 0.06)
-  pillow(M.slateMat, 0.5, -0.06)
+  pillow(M.slateMat, -0.55, 0.06)
+  pillow(M.slateMat, 0.55, -0.06)
 
   // purple blanket: wavy top + hem + fold ridges + pleated east drape
   {
@@ -107,5 +107,5 @@ export function buildBed(scene, ctx) {
       pleat.castShadow = true; g.add(pleat)
     }
   }
-  aoBlob(BW + 0.3, BL + 0.3, -1.05, 0.25, 0.005, 0.9)
+  aoBlob(BW + 0.3, BL + 0.3, -0.85, 0.25, 0.005, 0.9)
 }

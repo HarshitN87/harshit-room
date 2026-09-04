@@ -22,8 +22,8 @@ export function buildWardrobe(scene, ctx, layout) {
   wbox(W2, 2.72, DP, M.woodMat, CX, 0.10 + 2.72 / 2, ZN + DP / 2)
   wbox(W2, 0.10, DP - 0.04, M.frameWoodMat, CX, 0.05, ZN + DP / 2) // plinth
   wbox(W2 - 0.02, 0.05, 0.06, M.edgeBandMat, CX, 0.115, FZ - 0.01).castShadow = false // plinth shadow line
-  wbox(W2 + 0.06, 0.10, DP + 0.06, M.frameWoodMat, CX, 2.87, ZN + DP / 2) // cornice
-  wbox(W2 + 0.02, 0.025, DP + 0.02, M.edgeBandMat, CX, 2.81, ZN + DP / 2).castShadow = false // cornice step
+  wbox(W2 + 0.06, 0.10, DP + 0.06, M.woodMat, CX, 2.87, ZN + DP / 2) // cornice
+  wbox(W2 + 0.02, 0.025, DP + 0.02, M.woodMat, CX, 2.81, ZN + DP / 2).castShadow = false // cornice step
   // side scribes into the walls
   wbox(0.04, 2.82, DP, M.frameWoodMat, X0 + 0.02, 1.46, ZN + DP / 2)
   wbox(0.04, 2.82, DP, M.frameWoodMat, X1 - 0.02, 1.46, ZN + DP / 2)

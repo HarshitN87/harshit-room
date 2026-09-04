@@ -26,9 +26,10 @@ export function buildDoor(scene, ctx, layout) {
   }
   const LW = X1 - X0 - 0.04
   lbox(LW, DH - 0.06, 0.045, M.frameWoodMat, -LW / 2, DH / 2, 0)
-  // shaker insets + rims
+  // shaker insets + inner bead + rims
   for (const [iy, ih] of [[1.62, 0.62], [0.78, 0.8]]) {
     lbox(LW * 0.62, ih, 0.012, M.edgeBandMat, -LW / 2, iy, 0.024).castShadow = false
+    lbox(LW * 0.52, ih - 0.1, 0.008, M.frameWoodMat, -LW / 2, iy, 0.028).castShadow = false
     lbox(LW * 0.70, ih + 0.07, 0.008, M.frameWoodMat, -LW / 2, iy, 0.022).castShadow = false
   }
   // lever + rosettes + keyhole
@@ -40,10 +41,21 @@ export function buildDoor(scene, ctx, layout) {
   lever.position.set(leverX, 1.03, 0.10); lever.castShadow = true; leaf.add(lever)
   const knob = new THREE.Mesh(new THREE.SphereGeometry(0.02, 12, 10), M.chromeMat)
   knob.position.set(leverX, 1.03, 0.175); leaf.add(knob)
+  // keyhole escutcheon below the lever + kick plate
+  const esc = new THREE.Mesh(new THREE.CylinderGeometry(0.014, 0.014, 0.01, 12), M.brassMat)
+  esc.rotation.x = Math.PI / 2; esc.position.set(leverX, 0.90, 0.028); leaf.add(esc)
+  for (const fs of [1, -1]) {
+    const kick = new THREE.Mesh(new THREE.BoxGeometry(LW * 0.9, 0.18, 0.004), M.greyMetalMat)
+    kick.position.set(-LW / 2, 0.16, fs * 0.025); kick.castShadow = true; leaf.add(kick)
+  }
   // hinges on the jamb side
   for (const hy of [0.5, 1.1, 1.8]) {
     const barrel = new THREE.Mesh(new THREE.CylinderGeometry(0.014, 0.014, 0.09, 10), M.darkMetalMat)
     barrel.position.set(X1, hy, ZN + 0.02); barrel.castShadow = true; scene.add(barrel)
+    for (const fy of [hy - 0.05, hy + 0.05]) {
+      const fin = new THREE.Mesh(new THREE.SphereGeometry(0.009, 8, 6), M.darkMetalMat)
+      fin.position.set(X1, fy, ZN + 0.02); scene.add(fin)
+    }
     box(0.05, 0.07, 0.008, M.darkMetalMat, X1 - 0.025, hy, ZN + 0.03, scene).castShadow = false
   }
   // bottom gap shadow

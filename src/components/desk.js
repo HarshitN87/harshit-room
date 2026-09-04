@@ -38,6 +38,14 @@ export function buildDesk(scene, ctx) {
   dbox(0.9, 0.02, 0.4, M.woodMat, -0.1, 0.66, 0.28)
   for (const s of [-1, 1]) dbox(0.025, 0.025, 0.4, M.darkMetalMat, -0.1 + s * 0.44, 0.66, 0.28)
   dbox(0.9, 0.03, 0.015, M.woodMat, -0.1, 0.668, 0.475)
+  // keyboard tray felt liner + under-desk cable tray with drooping cable
+  dbox(0.86, 0.004, 0.36, new THREE.MeshStandardMaterial({ color: 0x1e3a2f, roughness: 1 }), -0.1, 0.672, 0.28).castShadow = false
+  dbox(0.7, 0.05, 0.08, M.darkMetalMat, 0.1, 0.68, -0.24)
+  const dropCable = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3([
+    new THREE.Vector3(0.25, 0.68, -0.24), new THREE.Vector3(0.28, 0.45, -0.26),
+    new THREE.Vector3(0.22, 0.2, -0.25), new THREE.Vector3(0.30, 0.02, -0.22)
+  ]), 20, 0.005, 6), M.blackPlasticMat)
+  g.add(dropCable)
   // footrest shelf + grips + riser
   dbox(0.95, 0.02, 0.44, M.woodMat, -0.1, 0.11, 0)
   for (let i = 0; i < 4; i++) dbox(0.88, 0.006, 0.025, M.blackPlasticMat, -0.1, 0.122, -0.15 + i * 0.1).castShadow = false
@@ -75,6 +83,11 @@ export function buildDesk(scene, ctx) {
       -0.108 + c * 0.024, 0.021, -0.062 + r * 0.019).castShadow = false
   }
   lbox(0.10, 0.004, 0.014, new THREE.MeshStandardMaterial({ color: 0x2a2a2e, roughness: 0.6 }), 0.012, 0.021, 0.033).castShadow = false
+  // speaker grilles flanking the keyboard
+  for (const s of [-1, 1]) {
+    lbox(0.018, 0.002, 0.10, M.darkMetalMat, s * 0.135, 0.019, 0.005).castShadow = false
+    for (let r = 0; r < 5; r++) lbox(0.014, 0.001, 0.004, new THREE.MeshBasicMaterial({ color: 0x000000 }), s * 0.135, 0.020, -0.032 + r * 0.018).castShadow = false
+  }
   lbox(0.11, 0.002, 0.065, M.greyMetalMat, 0, 0.019, 0.085).castShadow = false // touchpad
   // hinges + screen
   for (const s of [-1, 1]) {
@@ -84,6 +97,9 @@ export function buildDesk(scene, ctx) {
   const scrG = new THREE.Group(); scrG.position.set(0, 0.02, -0.095); scrG.rotation.x = -0.32; lap.add(scrG)
   const lid = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.22, 0.012), M.blackPlasticMat)
   lid.position.set(0, 0.11, 0); lid.castShadow = true; scrG.add(lid)
+  const logo = new THREE.Mesh(new THREE.CircleGeometry(0.012, 20),
+    new THREE.MeshStandardMaterial({ color: 0x111111, emissive: 0x9fd8ff, emissiveIntensity: 1.2, roughness: 0.4 }))
+  logo.position.set(0, 0.11, -0.007); logo.rotation.y = Math.PI; scrG.add(logo)
   const screenMat = new THREE.MeshStandardMaterial({ map: laptopScreenTex(true), emissive: 0xffffff, emissiveMap: laptopScreenTex(true), emissiveIntensity: 0.85, roughness: 0.3, color: 0x111111 })
   const laptopScreen = new THREE.Mesh(new THREE.PlaneGeometry(0.29, 0.19), screenMat)
   laptopScreen.position.set(0, 0.11, 0.007); scrG.add(laptopScreen)
@@ -117,6 +133,10 @@ export function buildDesk(scene, ctx) {
   // spring + cable
   const spring = ab(new THREE.CylinderGeometry(0.012, 0.012, 0.15, 8), M.darkMetalMat, 0.032, 0.15, 0.012)
   spring.rotation.z = -0.3
+  for (const cy of [0.10, 0.20]) {
+    const clip = new THREE.Mesh(new THREE.TorusGeometry(0.010, 0.003, 6, 12), M.blackPlasticMat)
+    clip.position.set(0.032 - (0.15 - cy) * 0.29, cy, 0.012); clip.rotation.y = Math.PI / 2; clip.rotation.z = -0.3; lamp.add(clip)
+  }
   const cableCurve = new THREE.CatmullRomCurve3([
     new THREE.Vector3(-0.03, 0.01, -0.03), new THREE.Vector3(0.05, 0.14, -0.03),
     new THREE.Vector3(0.03, 0.30, -0.02), new THREE.Vector3(-0.06, 0.44, 0.0)
@@ -147,6 +167,8 @@ export function buildDesk(scene, ctx) {
   tmb(new THREE.CylinderGeometry(0.04, 0.04, 0.18, 20), new THREE.MeshStandardMaterial({ color: 0xd8c95a, roughness: 0.1, transparent: true, opacity: 0.55 }), 0, 0.09, 0)
   tmb(new THREE.CylinderGeometry(0.034, 0.034, 0.11, 16), M.waterMat, 0, 0.065, 0).castShadow = false
   tmb(new THREE.CylinderGeometry(0.0415, 0.0415, 0.06, 20, 1, true), M.labelMat, 0, 0.09, 0)
+  for (let ti = 0; ti < 3; ti++)
+    tmb(new THREE.BoxGeometry(0.002, 0.008, 0.012), M.skirtMat, 0.036, 0.05 + ti * 0.02, 0.02).castShadow = false
   tmb(new THREE.CylinderGeometry(0.022, 0.03, 0.025, 14), new THREE.MeshStandardMaterial({ color: 0xd8c95a, roughness: 0.1, transparent: true, opacity: 0.55 }), 0, 0.19, 0)
   tmb(new THREE.CylinderGeometry(0.025, 0.025, 0.024, 16), M.darkMetalMat, 0, 0.21, 0)
   for (let i = 0; i < 8; i++) {
@@ -173,6 +195,10 @@ export function buildDesk(scene, ctx) {
     bk.rotation.y = [0.15, -0.08, 0.04][i]
     const pg = dbox(w * 0.92, h * 0.6, d * 0.96, M.bookPageMat, bk.position.x, bk.position.y, bk.position.z)
     pg.rotation.y = bk.rotation.y; pg.castShadow = false
+    for (const by of [-0.008, 0.008]) {
+      const sband = dbox(w * 1.005, h * 0.16, d * 1.01, M.bookPageMat, bk.position.x, bk.position.y + by, bk.position.z)
+      sband.rotation.y = bk.rotation.y; sband.castShadow = false
+    }
     const band = dbox(w * 0.3, h * 1.02, d * 1.01, M.bookPageMat, bk.position.x, bk.position.y, bk.position.z)
     band.rotation.y = bk.rotation.y; band.castShadow = false
   })
@@ -184,6 +210,8 @@ export function buildDesk(scene, ctx) {
     m.position.set(x, y, z); m.castShadow = true; mug.add(m); return m
   }
   mmb(new THREE.CylinderGeometry(0.028, 0.024, 0.055, 18), M.creamCeramicMat, 0, 0.028, 0)
+  const mugLip = new THREE.Mesh(new THREE.TorusGeometry(0.027, 0.0028, 8, 24), M.creamCeramicMat)
+  mugLip.rotation.x = Math.PI / 2; mugLip.position.set(0, 0.055, 0); mug.add(mugLip)
   mmb(new THREE.CylinderGeometry(0.023, 0.023, 0.004, 18), M.coffeeMat, 0, 0.048, 0).castShadow = false
   const handle = mmb(new THREE.TorusGeometry(0.016, 0.0045, 8, 18), M.creamCeramicMat, -0.032, 0.03, 0)
   handle.rotation.y = Math.PI / 2
@@ -200,6 +228,7 @@ export function buildDesk(scene, ctx) {
     const pen = hmb(new THREE.CylinderGeometry(0.0045, 0.0045, 0.11, 10),
       new THREE.MeshStandardMaterial({ color: col, roughness: 0.5 }), i === 0 ? -0.008 : 0.009, 0.10, i === 0 ? -0.006 : 0.007)
     pen.rotation.set(i === 0 ? 0.2 : -0.22, 0, i === 0 ? 0.1 : -0.12)
+    hmb(new THREE.CylinderGeometry(0.006, 0.006, 0.012, 8), M.blackPlasticMat, pen.position.x, 0.152, pen.position.z).rotation.copy(pen.rotation)
     hmb(new THREE.CylinderGeometry(0.002, 0.004, 0.014, 8), M.chromeMat, pen.position.x, 0.045, pen.position.z).rotation.copy(pen.rotation)
   })
 

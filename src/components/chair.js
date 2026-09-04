@@ -52,6 +52,7 @@ export function buildChair(scene, ctx) {
   }
   // gas lift + telescopic covers + mechanism
   ccyl(0.026, 0.026, 0.22, M.chromeMat, 0, 0.23, 0)
+  for (let bi = 0; bi < 3; bi++) ccyl(0.038 - bi * 0.003, 0.042 - bi * 0.003, 0.03, M.blackPlasticMat, 0, 0.145 + bi * 0.032, 0)
   ccyl(0.045, 0.05, 0.09, M.blackPlasticMat, 0, 0.12, 0)
   ccyl(0.04, 0.045, 0.07, M.blackPlasticMat, 0, 0.30, 0)
   crbox(0.30, 0.07, 0.28, 0.02, M.darkMetalMat, 0, 0.375, -0.02) // tilt mechanism
@@ -92,6 +93,7 @@ export function buildChair(scene, ctx) {
     crbox(0.09, 0.06, 0.36, 0.025, fabric, s * 0.30, 0.76, 0.02)
     cbox(0.07, 0.006, 0.30, stitchMat, s * 0.30, 0.792, 0.02).castShadow = false
     cbox(0.05, 0.03, 0.05, M.blackPlasticMat, s * 0.30, 0.52, 0.16) // height-adjust collar
+    cbox(0.02, 0.014, 0.03, M.darkMetalMat, s * 0.335, 0.52, 0.16).rotation.y = s * 0.2 // paddle button
   }
 
   // backrest spine + padded panels + lumbar pillow + buttons
@@ -122,6 +124,7 @@ export function buildChair(scene, ctx) {
   }
   brbox(0.32, 0.15, 0.09, 0.04, fabric, 0, 0.86, 0.0)
   bbox(0.28, 0.014, 0.014, weltMat, 0, 0.795, 0.045).castShadow = false
+  bbox(0.24, 0.006, 0.006, stitchMat, 0, 0.885, 0.048).castShadow = false // headrest stitch
 
   aoBlob(1.0, 1.0, 0.72, 0.35, 0.005, 0.9)
 }

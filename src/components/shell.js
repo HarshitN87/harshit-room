@@ -20,6 +20,12 @@ export function buildShell(scene, ctx) {
   rbox(W + 0.5, 0.26, D + 0.5, 0.03, new THREE.MeshStandardMaterial({ color: 0x2b2e3a, roughness: 0.85 }), 0, -0.25, 0)
   box(W + 0.54, 0.04, D + 0.54, new THREE.MeshStandardMaterial({ color: 0x3d4152, roughness: 0.7 }), 0, -0.1, 0)
 
+  // floor border inlay (same floor, framed perimeter)
+  const inlayMat = new THREE.MeshStandardMaterial({ color: 0x4a3423, roughness: 0.7 })
+  for (const [w, d, x, z] of [[W - 0.3, 0.08, 0, -D / 2 + 0.19], [W - 0.3, 0.08, 0, D / 2 - 0.19], [0.08, D - 0.3, -W / 2 + 0.19, 0], [0.08, D - 0.3, W / 2 - 0.19, 0]]) {
+    const strip = new THREE.Mesh(new THREE.BoxGeometry(w, 0.005, d), inlayMat)
+    strip.position.set(x, 0.003, z); strip.receiveShadow = true; scene.add(strip)
+  }
   const T = 0.12 // wall thickness
   const XW = -W / 2, ZN = -D / 2
 
@@ -81,6 +87,9 @@ export function buildShell(scene, ctx) {
   filament.rotation.x = Math.PI / 2
   const bulbGlow = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, color: 0xffcf7a, transparent: true, opacity: 0.45, depthWrite: false }))
   bulbGlow.scale.set(0.7, 0.7, 1); bulbGlow.position.set(0, 2.60, 0); pendG.add(bulbGlow)
+  // pull cord + brass bob (same pendant)
+  ppart(new THREE.CylinderGeometry(0.003, 0.003, 0.18, 6), M.darkMetalMat, 0.035, 2.60, 0)
+  ppart(new THREE.SphereGeometry(0.012, 10, 8), M.brassMat, 0.035, 2.50, 0)
 
   /* ---- LED strip along north wall (same fitting) ---- */
   const ledG = new THREE.Group(); ledG.position.set(-0.75, 2.97, ZN + 0.30); scene.add(ledG)
@@ -94,6 +103,7 @@ export function buildShell(scene, ctx) {
     lpart(0.035, 0.014, 0.01, i % 3 ? M.pinkLedMat : M.cyanLedMat, -0.92 + i * 0.08, 0.012, 0.014).castShadow = false
   lpart(0.04, 0.035, 0.035, M.blackPlasticMat, -1.0, 0, 0)
   lpart(0.04, 0.035, 0.035, M.blackPlasticMat, 1.0, 0, 0)
+  for (let i = 0; i < 5; i++) lpart(0.03, 0.05, 0.04, M.blackPlasticMat, -0.8 + i * 0.4, 0.005, 0).castShadow = false // mounting clips
   const ledGlow = new THREE.PointLight(0xff2f6d, 2.5, 5, 1.9)
   ledGlow.position.set(-0.75, 2.85, ZN + 0.7); scene.add(ledGlow)
 
@@ -107,6 +117,9 @@ export function buildShell(scene, ctx) {
   bpart(new THREE.CylinderGeometry(0.115, 0.115, 0.012, 24), M.redBucketMat, 0, 0.016, 0)
   const rim = bpart(new THREE.TorusGeometry(0.14, 0.009, 8, 28), M.redBucketMat, 0, 0.29, 0)
   rim.rotation.x = Math.PI / 2
+  // bail handle + ear mounts (same bucket)
+  bpart(new THREE.TorusGeometry(0.125, 0.007, 8, 24, Math.PI), M.darkMetalMat, 0, 0.30, 0)
+  for (const s of [-1, 1]) bpart(new THREE.SphereGeometry(0.012, 10, 8), M.darkMetalMat, s * 0.125, 0.30, 0).castShadow = false
   for (let i = 0; i < 12; i++) {
     const a = (i / 12) * Math.PI * 2
     const rib = bpart(new THREE.BoxGeometry(0.012, 0.12, 0.012), M.redBucketMat, Math.cos(a) * 0.142, 0.15, Math.sin(a) * 0.142)

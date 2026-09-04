@@ -48,8 +48,16 @@ export function buildWindowWall(scene, ctx, layout) {
   for (const mx of [-0.30, 0.30]) wrbox(0.04, 1.7, 0.05, 0.01, M.skirtMat, mx, CY, 0.025, winG).castShadow = false
   wbox(1.8, 0.04, 0.05, M.skirtMat, 0, CY, 0.025, winG).castShadow = false
   for (const sx of [-0.96, 0.96]) wbox(0.05, 1.98, 0.06, M.skirtMat, sx, CY, 0.01, winG).castShadow = false
-  // latch
+  // backband molding (second architrave layer) + putty bevels
+  for (const sx of [-1.0, 1.0]) wbox(0.03, 2.06, 0.04, M.skirtMat, sx, CY, 0.0, winG).castShadow = false
+  wbox(2.0, 0.03, 0.04, M.skirtMat, 0, CY + 0.955, 0.0, winG).castShadow = false
+  wbox(2.0, 0.03, 0.04, M.skirtMat, 0, CY - 0.955, 0.0, winG).castShadow = false
+  const putty = new THREE.MeshStandardMaterial({ color: 0xe8e2d4, roughness: 0.8 })
+  wbox(1.78, 0.018, 0.02, putty, 0, CY + 0.83, 0.032, winG).castShadow = false
+  wbox(1.78, 0.018, 0.02, putty, 0, CY - 0.83, 0.032, winG).castShadow = false
+  // latch + brass sash lock at the meeting rail
   wbox(0.03, 0.14, 0.04, M.darkMetalMat, 0.03, CY + 0.05, 0.06, winG)
+  wbox(0.05, 0.03, 0.03, M.brassMat, -0.02, CY, 0.055, winG)
   // sill nose + apron
   wrbox(2.06, 0.05, 0.22, 0.01, M.skirtMat, 0, 0.655, 0.1, winG).receiveShadow = true
   wbox(1.9, 0.07, 0.03, M.skirtMat, 0, 0.60, 0.02, winG).castShadow = false
@@ -77,6 +85,11 @@ export function buildWindowWall(scene, ctx, layout) {
     scene.add(mesh); curtains.push(mesh)
     const hem = new THREE.Mesh(new THREE.BoxGeometry(0.02, 0.035, w * 0.96), m)
     hem.position.set(XW + 0.28, 0.56, zc); scene.add(hem)
+    // side hems on both curtain edges
+    for (const s of [-1, 1]) {
+      const shem = new THREE.Mesh(new THREE.BoxGeometry(0.02, 1.86, 0.025), m)
+      shem.position.set(XW + 0.28, 1.5, zc + s * (w / 2 - 0.012)); scene.add(shem)
+    }
     const tape = new THREE.Mesh(new THREE.BoxGeometry(0.025, 0.07, w * 0.98), m)
     tape.position.set(XW + 0.28, 2.43, zc); tape.castShadow = true; scene.add(tape)
     for (let r = 0; r < 4; r++) {

@@ -26,6 +26,8 @@ export function buildBed(scene, ctx) {
   brbox(BW, 0.3, 0.06, 0.015, M.woodMat, 0, 0.22, -HZ + 0.03)
   for (const [lx, lz] of [[-HX + 0.05, -HZ + 0.05], [HX - 0.05, -HZ + 0.05], [-HX + 0.05, HZ - 0.05], [HX - 0.05, HZ - 0.05]]) {
     brbox(0.07, 0.12, 0.07, 0.015, M.woodMat, lx, 0.06, lz)
+    const collar = new THREE.Mesh(new THREE.BoxGeometry(0.085, 0.02, 0.085), M.frameWoodMat)
+    collar.position.set(lx, 0.125, lz); collar.castShadow = true; g.add(collar)
     const ft = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.055, 0.02, 12), M.darkMetalMat)
     ft.position.set(lx, 0.01, lz); g.add(ft)
   }
@@ -38,6 +40,13 @@ export function buildBed(scene, ctx) {
   bbox(MW, 0.02, 0.02, welt, 0, 0.45, -ML / 2).castShadow = false
   bbox(0.02, 0.02, ML, welt, -MW / 2, 0.45, 0).castShadow = false
   bbox(0.02, 0.02, ML, welt, MW / 2, 0.45, 0).castShadow = false
+  // side rail cap moldings + mattress side tufts
+  for (const s of [-1, 1]) bbox(0.075, 0.018, BL - 0.06, M.frameWoodMat, s * (HX - 0.03), 0.378, 0).castShadow = false
+  for (const s of [-1, 1]) for (let j = 0; j < 4; j++) {
+    const tb = new THREE.Mesh(new THREE.SphereGeometry(0.012, 10, 8), welt)
+    tb.scale.set(0.5, 1, 1); tb.position.set(s * (MW / 2 + 0.002), 0.45, -0.75 + j * 0.5); g.add(tb)
+  }
+  // mattress top buttons
   for (let i = 0; i < 8; i++) {
     const b = new THREE.Mesh(new THREE.SphereGeometry(0.013, 10, 8), welt)
     b.scale.set(1, 0.5, 1); b.position.set(-0.70 + (i % 4) * 0.47, 0.545, i < 4 ? -0.35 : 0.35); g.add(b)
@@ -86,6 +95,7 @@ export function buildBed(scene, ctx) {
     const skirt = brbox(MW - 0.02, 0.06, 1.9, 0.02, M.purpleMat, 0.03, 0.53, 0.2)
     skirt.castShadow = true
     bbox(MW - 0.04, 0.012, 0.03, M.purpleMat, 0.03, 0.56, 1.12).castShadow = false // hem
+  bbox(MW - 0.04, 0.008, 0.012, M.purpleMat, 0.03, 0.572, 1.06).castShadow = false // stitch line
     for (let i = 0; i < 7; i++) {
       const ridge = new THREE.Mesh(new THREE.CapsuleGeometry(0.016, MW - 0.2, 4, 10), M.purpleMat)
       ridge.rotation.z = Math.PI / 2; ridge.rotation.y = 0.03 * Math.sin(i * 2.1)

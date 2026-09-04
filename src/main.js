@@ -1,5 +1,6 @@
 import * as THREE from 'three'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js'
 import * as M from './components/materials.js'
 import { laptopScreenTex, glowTex } from './components/materials.js'
 import { makeHelpers } from './components/helpers.js'
@@ -31,17 +32,24 @@ const NIGHT_BG = new THREE.Color(0x0e1016)
 scene.background = DAY_BG.clone()
 scene.fog = new THREE.Fog(scene.background.clone(), 16, 32)
 
+/* soft studio reflections so chrome/glass read correctly (low intensity keeps night mood) */
+{
+  const pmrem = new THREE.PMREMGenerator(renderer)
+  scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture
+  scene.environmentIntensity = 0.22
+}
+
 const W = 4, D = 4, H = 3
 
 const camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 0.1, 100)
-camera.position.set(7.6, 5.4, -3.4)
+camera.position.set(7.6, 5.6, 7.0)
 
 const controls = new OrbitControls(camera, renderer.domElement)
-controls.target.set(-0.1, 0.8, 0)
+controls.target.set(-0.2, 0.8, -0.2)
 window.__room = { scene, camera, controls, W, D, H }
 controls.enableDamping = true
 controls.dampingFactor = 0.06
-controls.minDistance = 3.2
+controls.minDistance = 1.2
 controls.maxDistance = 12
 controls.minPolarAngle = 0.15
 controls.maxPolarAngle = 1.45
@@ -74,7 +82,7 @@ const cyanWash = new THREE.PointLight(0x5cc8ff, 3, 7, 1.9)
 cyanWash.position.set(1.2, 1.7, 0.6)
 scene.add(cyanWash)
 const ceilingGlow = new THREE.PointLight(0xffe0ae, 4, 6, 1.9)
-ceilingGlow.position.set(-1.5, 2.45, -0.5)
+ceilingGlow.position.set(-1.5, 2.45, 0.1)
 scene.add(ceilingGlow)
 scene.add(new THREE.AmbientLight(0xffffff, 0.15))
 
@@ -197,7 +205,7 @@ window.addEventListener('resize', () => {
   camera.updateProjectionMatrix()
   renderer.setSize(window.innerWidth, window.innerHeight)
 })
-const camStart = camera.position.clone(), camEnd = new THREE.Vector3(5.0, 3.5, -2.4)
+const camStart = camera.position.clone(), camEnd = new THREE.Vector3(4.8, 3.4, 5.0)
 let intro = 0
 window.__snapView = (px, py, pz, tx, ty, tz) => {
   intro = 1
@@ -206,6 +214,19 @@ window.__snapView = (px, py, pz, tx, ty, tz) => {
   controls.target.set(tx, ty, tz)
   camera.lookAt(controls.target)
   controls.update()
+}
+/* named snap presets via ?snap=chair|wardrobe|door|bed|desk (verification) */
+{
+  const q = new URLSearchParams(location.search)
+  const VIEWS = {
+    chair: [2.2, 1.4, 2.0, 0.35, 0.6, 0.35],
+    wardrobe: [-0.75, 1.7, 2.4, -0.75, 1.3, -1.5],
+    door: [1.0, 1.3, 1.3, 0.9, 1.0, -1.5],
+    bin: [0.75, 1.0, 0.3, 0.8, 0.15, -1.0],
+    bed: [1.8, 2.2, 3.1, -1.2, 0.5, 0.2],
+    desk: [0.2, 1.7, 2.4, 1.15, 0.65, 0.1]
+  }
+  if (q.has('snap') && VIEWS[q.get('snap')]) window.__snapView(...VIEWS[q.get('snap')])
 }
 const clock = new THREE.Clock()
 let firstFrame = true

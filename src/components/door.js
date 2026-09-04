@@ -8,28 +8,28 @@ export function buildDoor(scene, ctx, layout) {
   const X0 = 0.5, X1 = 1.5, DH = 2.2, CX = (X0 + X1) / 2
 
   // architrave
-  rbox(0.09, DH + 0.06, 0.16, 0.015, M.skirtMat, X0 - 0.045, DH / 2, ZN, scene).castShadow = false
-  rbox(0.09, DH + 0.06, 0.16, 0.015, M.skirtMat, X1 + 0.045, DH / 2, ZN, scene).castShadow = false
-  rbox(X1 - X0 + 0.18, 0.09, 0.16, 0.015, M.skirtMat, CX, DH + 0.045, ZN, scene).castShadow = false
+  rbox(0.09, DH + 0.06, 0.16, 0.015, M.frameWoodMat, X0 - 0.045, DH / 2, ZN, scene).castShadow = false
+  rbox(0.09, DH + 0.06, 0.16, 0.015, M.frameWoodMat, X1 + 0.045, DH / 2, ZN, scene).castShadow = false
+  rbox(X1 - X0 + 0.18, 0.09, 0.16, 0.015, M.frameWoodMat, CX, DH + 0.045, ZN, scene).castShadow = false
   // inner jamb liners
-  box(0.03, DH, 0.14, M.skirtMat, X0 + 0.015, DH / 2, ZN, scene).castShadow = false
-  box(0.03, DH, 0.14, M.skirtMat, X1 - 0.015, DH / 2, ZN, scene).castShadow = false
+  box(0.03, DH, 0.14, M.frameWoodMat, X0 + 0.015, DH / 2, ZN, scene).castShadow = false
+  box(0.03, DH, 0.14, M.frameWoodMat, X1 - 0.015, DH / 2, ZN, scene).castShadow = false
 
   // leaf hinged at x=X1, opened into the room
   const leaf = new THREE.Group()
   leaf.position.set(X1, 0, ZN + 0.02)
-  leaf.rotation.y = -0.5
+  leaf.rotation.y = 0.5
   scene.add(leaf)
   function lbox(w, h, d, mat, x, y, z) {
     const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat)
     m.position.set(x, y, z); m.castShadow = m.receiveShadow = true; leaf.add(m); return m
   }
   const LW = X1 - X0 - 0.04
-  lbox(LW, DH - 0.06, 0.045, M.woodMat, -LW / 2, DH / 2, 0)
+  lbox(LW, DH - 0.06, 0.045, M.frameWoodMat, -LW / 2, DH / 2, 0)
   // shaker insets + rims
   for (const [iy, ih] of [[1.62, 0.62], [0.78, 0.8]]) {
-    lbox(LW * 0.62, ih, 0.012, M.frameWoodMat, -LW / 2, iy, 0.024).castShadow = false
-    lbox(LW * 0.70, ih + 0.07, 0.008, M.woodMat, -LW / 2, iy, 0.022).castShadow = false
+    lbox(LW * 0.62, ih, 0.012, M.edgeBandMat, -LW / 2, iy, 0.024).castShadow = false
+    lbox(LW * 0.70, ih + 0.07, 0.008, M.frameWoodMat, -LW / 2, iy, 0.022).castShadow = false
   }
   // lever + rosettes + keyhole
   const leverX = -LW + 0.12

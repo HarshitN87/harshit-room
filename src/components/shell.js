@@ -24,7 +24,7 @@ export function buildShell(scene, ctx) {
   const XW = -W / 2, ZN = -D / 2
 
   /* ---- west wall (x=XW) with window hole: z -1.2..0.2, y 0.8..2.3 ---- */
-  const winZ0 = -1.2, winZ1 = 0.2, winY0 = 0.8, winY1 = 2.3
+  const winZ0 = -0.8, winZ1 = 1.0, winY0 = 0.7, winY1 = 2.4
   const winCZ = (winZ0 + winZ1) / 2, winW = winZ1 - winZ0
   rbox(T, H, (winZ0 + D / 2), 0.015, M.wallMat, XW, H / 2, (-D / 2 + winZ0) / 2, scene).castShadow = false
   rbox(T, H, (D / 2 - winZ1), 0.015, M.wallMat, XW, H / 2, ((winZ1 + D / 2) / 2), scene).castShadow = false
@@ -63,7 +63,7 @@ export function buildShell(scene, ctx) {
   /* ---- ceiling pendant near window (same fitting as before) ---- */
   const pendG = new THREE.Group()
   pendG.name = 'ceilingPendant'
-  pendG.position.set(-1.5, 0, -0.5)
+  pendG.position.set(-1.5, 0, 0.1)
   scene.add(pendG)
   function ppart(geo, mat, x, y, z) {
     const m = new THREE.Mesh(geo, mat)
@@ -83,7 +83,7 @@ export function buildShell(scene, ctx) {
   bulbGlow.scale.set(0.7, 0.7, 1); bulbGlow.position.set(0, 2.60, 0); pendG.add(bulbGlow)
 
   /* ---- LED strip along north wall (same fitting) ---- */
-  const ledG = new THREE.Group(); ledG.position.set(-0.5, 0.35, ZN + 0.09); scene.add(ledG)
+  const ledG = new THREE.Group(); ledG.position.set(-0.75, 2.97, ZN + 0.30); scene.add(ledG)
   function lpart(w, h, d, mat, x, y, z) {
     const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat)
     m.position.set(x, y, z); ledG.add(m); return m
@@ -95,10 +95,10 @@ export function buildShell(scene, ctx) {
   lpart(0.04, 0.035, 0.035, M.blackPlasticMat, -1.0, 0, 0)
   lpart(0.04, 0.035, 0.035, M.blackPlasticMat, 1.0, 0, 0)
   const ledGlow = new THREE.PointLight(0xff2f6d, 2.5, 5, 1.9)
-  ledGlow.position.set(-0.5, 0.5, ZN + 0.5); scene.add(ledGlow)
+  ledGlow.position.set(-0.75, 2.85, ZN + 0.7); scene.add(ledGlow)
 
   /* ---- red bucket east of wardrobe (same fitting) ---- */
-  const bkG = new THREE.Group(); bkG.position.set(-0.1, 0, 1.35); scene.add(bkG)
+  const bkG = new THREE.Group(); bkG.position.set(0.8, 0, -1.0); scene.add(bkG)
   function bpart(geo, mat, x, y, z) {
     const m = new THREE.Mesh(geo, mat)
     m.position.set(x, y, z); m.castShadow = m.receiveShadow = true; bkG.add(m); return m
@@ -113,12 +113,12 @@ export function buildShell(scene, ctx) {
     rib.rotation.y = -a
   }
   bpart(new THREE.CylinderGeometry(0.125, 0.125, 0.006, 24), new THREE.MeshStandardMaterial({ color: 0x3d0808, roughness: 1 }), 0, 0.035, 0).castShadow = false
-  aoBlob(0.45, 0.45, -0.1, 1.35, 0.005, 0.9)
+  aoBlob(0.45, 0.45, 0.8, -1.0, 0.005, 0.9)
 
   // floating rose mount (open dollhouse top, MVP trick) for pendant wire
   {
     const rose = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.11, 0.04, 20), M.ceilMat)
-    rose.position.set(-1.5, H + 0.06, -0.5); scene.add(rose)
+    rose.position.set(-1.5, H + 0.06, 0.1); scene.add(rose)
   }
 
   return { bulbMesh, bulbGlow, ledGlow, winZ0, winZ1, winY0, winY1, winCZ, XW, ZN }
